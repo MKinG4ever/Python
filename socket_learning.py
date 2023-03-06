@@ -15,6 +15,7 @@ def main():
         except BaseException as exc:
             print(f'Error! {exc}\n')
             s.change_addr()
+            s.server_listen()
     elif ans == '2':
         print('\n> CLIENT\n')
         c.change_addr()
