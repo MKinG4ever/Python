@@ -1,62 +1,42 @@
-from time import sleep as delay
 import socket
+import time
 
 
 def main():
-    c = Server()  # client
-    s = Server()  # server
-    print('for start choose a mode:')
-    print('1. SERVER\n2. CLIENT\n')
-    a = input()
-    if a == '1':
-        s.get_ip()
-        s.get_data()
-        print()
-        s.listen()
-    elif a == '2':
-        c.get_ip()
-        print()
-        c.send()
+    s = SocketWiz()
+    c = SocketWiz()
+    print('1.Server\n2.Client\n')
+    ans = input()
+    if ans == '1':
+        print('\n> SERVER\n')
+        try:
+            s.change_addr()
+            s.server_listen()
+        except BaseException as exc:
+            print(f'Error! {exc}\n')
+            s.change_addr()
+    elif ans == '2':
+        print('\n> CLIENT\n')
+        c.change_addr()
+        c.client_connect()
 
 
-class Server:
+class SocketWiz:
     def __init__(self):
-        self.ip = '127.0.0.1'
-        self.port = 80
-        self.data = b'- Data [..]'
-        self.tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # tcp connection
-        self.udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  # udp connection
+        self._ip = '127.0.0.1'
+        self._port = 5555
 
-    def get_ip(self):
-        self.ip = self.question('IP: ', '127.0.0.1')
-        self.port = int(self.question('Port: ', '80'))
+    @property
+    def addr(self):
+        return tuple((self._ip, self._port))
 
-    def get_data(self):
-        self.data = input('Data: ').encode()
+    @property
+    def tcp_portal(self):
+        return socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-    def listen(self):
-        print('> SERVER')
-        print(f'<{self.ip}:{self.port}>')
-        print('Listening...')
-        tcp = self.tcp
-        tcp.bind((self.ip, self.port))
-        tcp.listen(5)
-        while True:
-            client, addr = tcp.accept()
-            print(f'input connection: {addr}\n{client}')
-            client.send(self.data)
-            client.close()
-
-    def send(self):
-        print('> CLIENT')
-        print(f'<{self.ip}:{self.port}>')
-        print('Sending packet...')
-        tcp = self.tcp
-        tcp.connect((self.ip, self.port))
-        data = tcp.recv(1024)
-        print(f'Data: {data}')
-        input('Enter any key to EXIT.')
-        tcp.close()
+    @property
+    def udp_portal(self):
+        return socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
     @staticmethod
     def question(quest, answer):
@@ -66,6 +46,36 @@ class Server:
         if a and a != answer:
             answer = a
         return answer
+
+    def change_addr(self):
+        self._ip = self.question('IP: ', self._ip)
+        self._port = int(self.question('PORT: ', self._port))
+
+    def server_listen(self):
+        print(f'binding <{self._ip}> : <{self._port}>')
+        portal = self.tcp_portal
+        portal.bind(self.addr)
+        portal.listen(5)  # 5 connection per-time
+        print('listening...')
+        loop = 0  # counting inputs
+        while True:
+            loop += 1
+            _client, _addr = portal.accept()  # if data received
+            print(f'[{loop}] input connection: {_addr}\n{_client}')  # Client Address
+            _client.send(b'- Data (Server>Client): [..]')  # sending data to client
+            print('packet send.\n')
+            _client.close()  # end of connection
+
+    def client_connect(self):
+        portal = self.tcp_portal
+        portal.connect(self.addr)
+        data = portal.recv(2048)
+        print(f'[Data]: {data}')
+        for i in range(25):
+            print(f'\rexit in: {25 - i}', end='')
+            time.sleep(1)
+        print()
+        portal.close()
 
 
 if __name__ == '__main__':
