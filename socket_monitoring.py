@@ -24,6 +24,7 @@ class SocketTool:
         portal.bind(self.addr)
         portal.listen(9)
         loop = 0
+        print(self._port, end='|')
         while True:
             loop += 1
             _client, _addr = portal.accept()  # if data received
@@ -35,7 +36,12 @@ class SocketTool:
 
     def ports(self):
         # monitor first 1000 ports
-        t = [Thread(target=SocketTool(self._ip, _).portal_listen) for _ in range(1, 1000)]
+        t = []
+        for i in range(1000):
+            try:
+                t.append(Thread(target=SocketTool(self._ip, i).portal_listen))
+            except BaseException as exc:
+                print(f'Error! {exc}\n')
         for m in t:
             m.start()
         for n in t:
