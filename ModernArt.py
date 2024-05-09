@@ -1,5 +1,3 @@
-import random
-
 from Data import *  # random, time, delay, alpha, rgba, random_point
 import turtle
 
