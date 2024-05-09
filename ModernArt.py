@@ -3,18 +3,17 @@ import turtle
 
 
 def main():
-    """Main Part of ModernArt Gallery (v0.1.0)"""
-    # TEST PROGRAM
+    """Main function for test module"""
     a = ModernArt(900, 600)
     a.help()
-    a.draw_bubbles(25)
-    a.draw_liner_dots(100, 5)
+    a.draw_bubbles(50, 25, 150)
+    a.draw_liner_dots(100, 35, 7, True)
     a.draw_exitonclick()
 
 
 class ModernArt:
     def __init__(self, width: int, height: int):
-        self.version = "0.1.2"
+        self.version = "0.1.5"
         f"""
             Initialize the Modern-Art Project
             author: MKinG
@@ -77,28 +76,40 @@ class ModernArt:
         t.color(*self.attr["color"])
         # pen
         t.pensize(round(random.random() * 10 * 3.1415926535))  # random pen-size
-        t.pencolor(*rgba(r=0))  # random pen-color
+        t.pencolor(*rgba())  # random pen-color
         # fill
-        t.fillcolor(*rgba(b=1))  # random fillcolor
+        t.fillcolor(*rgba())  # random fillcolor
 
-    def draw_bubbles(self, bubbles: int) -> None:
+    def set_style(self, color=None, pencolor=None, pensize=None, fillcolor=None) -> None:
+        """Set style for the Turtle object"""
+        t = self._turtle
+        # turtle
+        if color is not None:
+            t.color(color)
+        # pen
+        if pensize is not None:
+            t.pensize(pensize)  # set pen-size
+        if pencolor is not None:
+            t.pencolor(pencolor)  # set pen-color
+        # fill
+        if fillcolor is not None:
+            t.fillcolor(fillcolor)  # set fillcolor
+
+    def draw_bubbles(self, bubbles: int, base_size=50, random_range=50) -> None:
         """Draw bubbles on screen in random order"""
         # Materials
         t = self._turtle
         w, h = self.width // 2, self.height // 2
         # Draw
         for i in range(bubbles):
-            # size of bubbles
-            # color of bubbles
             # check position base on size
             t.teleport(w * random_point(), h * random_point())
-            t.pencolor(*rgba(r=0, b=1))  # random pen-color
-            t.fillcolor(*rgba(r=0, g=0))  # random fillcolor
+            self.random_style()
             t.begin_fill()
-            t.circle(75 * random.random())
+            t.circle(base_size + random.randint(0, random_range))
             t.end_fill()
 
-    def draw_liner_dots(self, steps: int, loops=1, center_base=True) -> None:
+    def draw_liner_dots(self, steps: int, max_size=25, loops=1, center_base=True, pencolor=None, pensize=None) -> None:
         """Draw sorted circles on screen with random styles"""
         # Materials
         t = self._turtle
@@ -109,12 +120,13 @@ class ModernArt:
             for y in range(-1 * h + steps, h, steps):
                 y *= -1
                 for x in range(-1 * w + steps, w, steps):
-                    rr = random.random() * 35  # random radius | b= base size
+                    rr = random.random() * max_size  # random radius | b= base size
                     if center_base:
                         t.teleport(x, y - rr)  # Center Base Circles
                     else:
                         t.teleport(x, y)  # BottomBorder Base Circles [Original CODE]
                     self.random_style()
+                    self.set_style(pencolor=pencolor, pensize=pensize)
                     t.circle(rr)
 
     def draw_exitonclick(self):
