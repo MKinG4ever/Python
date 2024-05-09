@@ -35,6 +35,7 @@ def rgba(r=None, g=None, b=None) -> tuple:
         :param b: Blue: float between 0 and 1
     """
     # feature: from a-b range for r,g,b
+    # feature: crate a Class of rgba
     return alpha(r), alpha(g), alpha(b)
 
 
